@@ -13,6 +13,7 @@
 ## 자주 쓰는 라이브러리
 
 > pydicom
+
 DICOM 이미지를 다룰 수 있다.
 
 ```console
@@ -116,6 +117,7 @@ pip install pydicom
 ### Numpy 배열 관련
 
 > 배열 순서 바꾸기
+
 ex. NHWC에서 pytorch에서 지원하는 NCHW 형태로 바꾸고 싶을 때
 ```python
 ```
