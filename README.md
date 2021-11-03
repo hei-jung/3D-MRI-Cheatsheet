@@ -104,6 +104,14 @@ pip install pydicom
 ```python
 ````
 
+### 에러 잡기
+
+> Error(s) in loading state_dict
+>> Missing key(s) in state_dict & Unexpected key(s) in state_dict
+```python
+model.load_state_dict(pretrained, strict=False)  # strict: False로 해주기
+```
+
 ## 기타 잡다한 코드
 
 ### cuda 캐시 비우기
