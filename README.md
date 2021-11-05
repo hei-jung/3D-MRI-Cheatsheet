@@ -33,10 +33,15 @@ arr = np.stack((arr,)*3, axis=-1)  # to 3 channel
 
 > 이미지 자르기(가운데 기준)
 ```python
-def preprocess(arr, size):
+def crop(arr, size):
     h, w = arr.shape
-    s = size//2 if size%2==0 else (size+1)//2
-    arr = arr[(h//2-s):(h//2+s-1), (w//2-s):(w//2+s-1)]
+     if size%2==0 else (size+1)//2
+    if size%2==0:
+        s = size//2
+        arr = arr[(h//2-s):(h//2+s), (w//2-s):(w//2+s)]
+    else:
+        s = (size+1)//2
+        arr = arr[(h//2-s):(h//2+s-1), (w//2-s):(w//2+s-1)]
     return arr
 ```
 
