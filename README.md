@@ -26,16 +26,39 @@ pip install pydicom
 ```python
 ```
 
-> 이미지 자르기
+> grayscale을 rgb로 변환
 ```python
+arr = np.stack((arr,)*3, axis=-1)  # to 3 channel
+```
+
+> 이미지 자르기(가운데 기준)
+```python
+def preprocess(arr, size):
+    h, w = arr.shape
+    s = size//2 if size%2==0 else (size+1)//2
+    arr = arr[(h//2-s):(h//2+s-1), (w//2-s):(w//2+s-1)]
+    return arr
 ```
 
 > 이미지 thresholding
 ```python
 ```
 
-> 이미지 resizing
+> 3D 이미지 resizing
 ```python
+def resize_data(data, new_size_x, new_size_y, new_size_z):
+    initial_size_x, initial_size_y, initial_size_z = data.shape
+    
+    delta_x = initial_size_x / new_size_x
+    delta_y = initial_size_y / new_size_y
+    delta_z = initial_size_z / new_size_z
+    
+    new_data = np.zeros((new_size_x, new_size_y, new_size_z))
+    
+    for x, y, z in itertools.product(range(new_size_x), range(new_size_y), range(new_size_z)):
+        new_data[x, y, z] = data[int(x*delta_x), int(y*delta_y), int(z*delta_z)]
+    
+    return new_data
 ```
 
 > resized 이미지 새 파일로 저장
@@ -46,18 +69,46 @@ pip install pydicom
 
 > standardize(표준화)
 ```python
+def standardize(df):  # standardization(표준화)
+    new_df = df.copy()
+    def _stand(x):
+        mean, std = x.mean(axis=0), x.std(axis=0)
+        z = (x - mean) / std
+        return z
+    
+    for col in new_df.columns:
+        new_df[col] = _stand(new_df[col])
+    return new_df
 ```
 
 > normalize(정규화)
 ```python
+def normalize(df):  # 정규화
+    new_df = df.copy()
+    
+    def _norm(x):
+        z = (x - min(x)) / (max(x) - min(x))
+        return z
+    
+    for col in df.columns:
+        new_df[col] = _norm(new_df[col])
+    
+    return new_df
 ```
 
 > denormalize
 ```python
+def denormalize(z, x):
+    x = z*(max(x) - min(x)) + min(x)
+    return np.round(x, 4)
 ```
 
 > destandardize + denormalize
 ```python
+def denormalize(z, x):
+    mean = x.mean(axis=0)  # x: original data
+    x = z*(max(x - mean) - min(x - mean)) + min(x - mean) + mean
+    return np.round(x, 4)
 ```
 
 ## 학습 관련
@@ -70,10 +121,49 @@ pip install pydicom
 
 > training
 ```python
+def train_epoch(model, criterion, optimizer, train_loader, scheduler=None):
+    # train the model
+    train_loss = 0.0
+    model.train()
+    for batch_idx, (inputs, y) in enumerate(train_loader):
+        # import data and move to gpu
+        inputs, y = inputs.to(device, dtype=torch.float), y.to(device, dtype=torch.float)
+        
+        # clear the gradients
+        optimizer.zero_grad()
+        
+        # compute the model output
+        y_hat = model(inputs)
+        loss = criterion(y_hat, y)
+        
+        # credit assignment (back propagation)
+        loss.backward()
+        
+        # update model weights
+        optimizer.step()
+        if scheduler is not None:
+            scheduler.step()
+            
+#             train_loss = train_loss + ((1/(batch_idx+1)) * (loss.data - train_loss))
+        train_loss += loss.item() * inputs.size(0)
+        print("=", end='')
+    return train_loss
 ```
 
 > validation
 ```python
+def valid_epoch(model, criterion, test_loader):
+    # validate the model
+    valid_loss = 0.0
+    model.eval()
+    for batch_idx, (inputs, y) in enumerate(test_loader):
+        inputs, y = inputs.to(device, dtype=torch.float), y.to(device, dtype=torch.float)
+        y_hat = model(inputs)
+        loss = criterion(y_hat, y)
+#             valid_loss = valid_loss + ((1/(batch_idx+1)) * (loss.data - valid_loss))
+        valid_loss += loss.item() * inputs.size(0)
+        print("=", end='')
+    return valid_loss
 ```
 
 > 학습
