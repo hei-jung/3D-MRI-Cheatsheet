@@ -35,7 +35,6 @@ arr = np.stack((arr,)*3, axis=-1)  # to 3 channel
 ```python
 def crop(arr, size):
     h, w = arr.shape
-     if size%2==0 else (size+1)//2
     if size%2==0:
         s = size//2
         arr = arr[(h//2-s):(h//2+s), (w//2-s):(w//2+s)]
