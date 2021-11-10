@@ -194,11 +194,15 @@ def valid_epoch(model, criterion, test_loader):
 
 > 내 학습 모델 `.pth` 파일로 저장
 ```python
+torch.save(model.state_dict(), '{}.pth'.format(type(model).__name__)) # save model as class name
 ```
 
 > `.pth` 파일 불러오기
 ```python
-````
+model = MyModel(in_channels, num_classes)
+model.load_state_dict(torch.load('{}.pth'.format(type(model).__name__)) # ...because I saved my model as class name
+# parameters like in_channels, num_classes must match
+```
 
 ### 에러 잡기
 
@@ -212,10 +216,19 @@ model.load_state_dict(pretrained, strict=False)  # strict: False로 해주기
 
 ### cuda 캐시 비우기
 ```python
+# CUDA out of memory
+import gc
+gc.collect()
+torch.cuda.empty_cache()
 ```
 
 ### 총 걸린 시간 계산
 ```python
+import time
+start = time.time()
+##
+end = time.time()
+exec_time = end - start  # return seconds
 ```
 
 ### Numpy 배열 관련
