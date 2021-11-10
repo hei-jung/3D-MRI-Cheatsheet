@@ -46,6 +46,8 @@ def crop(arr, size):
 
 > 이미지 thresholding
 ```python
+img[img < _] = _
+img[img > _] = _
 ```
 
 > 3D 이미지 resizing
