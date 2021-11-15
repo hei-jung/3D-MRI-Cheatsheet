@@ -238,12 +238,107 @@ def valid_epoch(model, criterion, test_loader):
     return valid_loss
 ```
 
-> 학습
+### 학습
+
+> required libraries
 ```python
+import torch
+from torch import nn, optim
+from sklearn.model_selection import train_test_split, KFold
+from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 ```
 
-> K-fold Cross Validation
+> basic settings
 ```python
+dataset = MyDataset()  # load dataset
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # set device
+
+# set loss functions
+criterion1 = nn.L1Loss()
+criterion2 = nn.MSELoss()
+```
+
+> K-fold Cross Validation (k=10)
+```python
+# source reference: https://medium.com/dataseries/k-fold-cross-validation-with-pytorch-and-sklearn-d094aa00105f
+k = 10
+splits = KFold(n_splits=k, shuffle=True, random_state=42)
+foldperf = {}
+
+for fold, (train_idx, val_idx) in enumerate(splits.split(np.arange(len(dataset)))):
+    print('Fold {}'.format(fold+1))
+    
+    train_sampler = SubsetRandomSampler(train_idx)
+    test_sampler = SubsetRandomSampler(val_idx)
+    
+    train_loader = DataLoader(dataset, batch_size=2, sampler=train_sampler)
+    test_loader = DataLoader(dataset, batch_size=2, sampler=test_sampler)
+    
+    # model = resnet(50, in_channels=1, num_classes=5)  # model_depth = [10, 18, 34, 50, 101, 152, 200]
+    # model = inception_v4(num_classes=5, in_channels=1)
+    model = inception_resnet_v2(num_classes=5, in_channels=1)
+    # model = densenet(121, in_channels=1, num_classes=5)  # model_depth = [121, 169, 201, 264]
+
+    model.load_state_dict(torch.load('{}.pth'.format(type(model).__name__)))
+    model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) ##1e-3
+    
+    model = model.float()
+    history = {'train_mae':[], 'test_mae':[], 'train_mse':[]}
+    
+    for epoch in range(num_epochs):
+        train_loss = train_epoch(model, criterion1, criterion2, optimizer, train_loader)
+        test_loss = valid_epoch(model, criterion1, test_loader)
+        
+        train_mae = train_loss[0] / len(train_loader.sampler)
+        train_mse = train_loss[1] / len(train_loader.sampler)
+        test_mae = test_loss / len(test_loader.sampler)
+        
+        print("\nEpoch:{}/{} AVG Training MAE Loss:{:.3f} AVG Test MAE Loss:{:.3f}".format(epoch+1,
+                                                                                num_epochs,
+                                                                                train_mae,
+                                                                                test_mae))
+        print(" AVG Training MSE Loss:{:.3f}".format(train_mse))
+        
+        history['train_mae'].append(train_mae)
+        history['test_mae'].append(test_mae)
+        history['train_mse'].append(train_mse)
+    print()
+    foldperf['fold{}'.format(fold+1)] = history
+```
+
+> without Cross Validation
+```python
+# split data to train and validation sets
+train, test = train_test_split(dataset, test_size=test_size)  # test_size default 0.25
+
+train_dl = DataLoader(train, batch_size=batch_size, shuffle=True)
+test_dl = DataLoader(test, batch_size=batch_size, shuffle=False)
+
+losses = {'train_mae': [], 'test_mae': [], 'train_mse': []}
+
+model = model.to(device)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+model.float()
+
+for epoch in range(num_epochs):
+    train_loss = train_epoch(model, criterion1, criterion2, optimizer, train_dl)
+    test_loss = valid_epoch(model, criterion1, test_dl)
+    
+    train_mae = train_loss[0] / len(train_dl)
+    train_mse = train_loss[1] / len(train_dl)
+    test_mae = test_loss / len(test_dl)
+    
+    print("\nEpoch:{}/{} AVG Training MAE Loss:{:.3f} AVG Test MAE Loss:{:.3f}".format(epoch+1,
+                                                                                num_epochs,
+                                                                                train_mae,
+                                                                                test_mae))
+    print(" AVG Training MSE Loss:{:.3f}".format(train_mse))
+        
+    losses['train_mae'].append(train_mae)
+    losses['test_mae'].append(test_mae)
+    losses['train_mse'].append(train_mse)
 ```
 
 ### 데이터 시각화
