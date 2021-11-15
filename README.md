@@ -24,6 +24,33 @@ pip install pydicom
 
 > 3D 이미지를 numpy 배열로 저장
 ```python
+# source reference: https://pydicom.github.io/pydicom/dev/auto_examples/image_processing/reslice.html
+df = pd.read_csv('./data.csv', index_col=0)  # index column contains folder names in my data
+images = []
+for fname in df.index:
+    img_dir = os.listdir(fname)
+    files = []
+    for img in img_dir:
+        files.append(dcmread(fname + '/' + img))
+    
+    slices = []
+    skipcount = 0
+    for f in files:
+        if hasattr(f, 'SliceLocation'):
+            slices.append(f)
+        else:
+            skipcount += 1
+    slices = sorted(slices, key=lambda s: s.SliceLocation)
+    
+    img_shape = list(slices[0].pixel_array.shape)
+    img_shape.append(len(slices))
+    image = np.zeros(img_shape)
+    
+    for i, ds in enumerate(slices):
+        data = ds.pixel_array
+        image[:,:,i] = data
+    images.append(image)
+arr = np.array(images)  # to numpy array
 ```
 
 > grayscale을 rgb로 변환
