@@ -241,10 +241,13 @@ ex. NHWC에서 pytorch에서 지원하는 NCHW 형태로 바꾸고 싶을 때
 
 > 파일로 저장
 ```python
+x = np.array([[1,2], [3,4]])
+np.save(FILENAME, x)
 ```
 
 > 배열 파일 불러오기
 ```python
+x = np.load(FILENAME)
 ```
 
 ### Pandas Dataframe 관련
