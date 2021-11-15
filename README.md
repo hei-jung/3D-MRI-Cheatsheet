@@ -237,6 +237,8 @@ exec_time = end - start  # return seconds
 
 ex. NHWC에서 pytorch에서 지원하는 NCHW 형태로 바꾸고 싶을 때
 ```python
+# if x.shape is (N, H, W, C)
+x = x.transpose(0,3,1,2)
 ```
 
 > 파일로 저장
