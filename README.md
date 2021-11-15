@@ -69,6 +69,9 @@ def resize_data(data, new_size_x, new_size_y, new_size_z):
 
 > resized 이미지 새 파일로 저장
 ```python
+ds.PixelData = resized_img.tobytes()
+ds.Rows, ds.Columns = resized_img.shape ### !!!!!!!!!!
+ds.save_as(FILENAME)
 ```
 
 ## 레이블 전처리
