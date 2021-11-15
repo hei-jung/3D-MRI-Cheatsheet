@@ -408,6 +408,15 @@ model.load_state_dict(torch.load('{}.pth'.format(type(model).__name__)) # ...bec
 # parameters like in_channels, num_classes must match
 ```
 
+> to change num of classes (ex. inception-resnet)
+```python
+_model = inception_resnet_v2()  # default
+_model.load_state_dict(torch.load('InceptionResnetV2.pth'))
+num_ftrs = _model.fc.in_features
+_model.fc = nn.Linear(num_ftrs, new_num_channels)
+model = _model
+```
+
 ### 에러 잡기
 
 > Error(s) in loading state_dict
