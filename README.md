@@ -150,7 +150,43 @@ def denormalize(z, x):
 ## 학습 관련
 
 ### 데이터셋 준비
+
+> single column for label
 ```python
+class MyDataset(Dataset):
+    
+    def __init__(self, df=None, col=0):
+        if df is None:
+            df = load_data()
+        self.X = df['image'].values
+        self.y = df.iloc[:, col]
+        
+    def __len__(self):
+        return len(self.X)
+    
+    def __getitem__(self, idx):
+        image = self.X[idx]
+        label = np.array([self.y.iloc[idx]]).astype('float')
+        return [image, label]
+```
+
+> multiple columns for label
+```python
+class MyDataset(Dataset):
+    
+    def __init__(self, df=None):
+        if df is None:
+            df = load_data()
+        self.X = df['image'].values
+        self.y = df.iloc[:, :5]
+        
+    def __len__(self):
+        return len(self.X)
+    
+    def __getitem__(self, idx):
+        image = self.X[idx]
+        label = np.array([self.y.iloc[idx]]).astype('float')
+        return [image, label]
 ```
 
 ### training & validation 함수
