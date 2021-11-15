@@ -249,7 +249,7 @@ np.save(FILENAME, x)
 
 > 배열 파일 불러오기
 ```python
-x = np.load(FILENAME)
+x = np.load('{FILENAME}.npy')
 ```
 
 ### Pandas Dataframe 관련
