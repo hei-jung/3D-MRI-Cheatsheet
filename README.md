@@ -345,10 +345,53 @@ for epoch in range(num_epochs):
 
 > loss plot
 ```python
+def plot_loss(train_losses, valid_losses, title='model loss'):
+    plt.plot(train_losses)
+    plt.plot(valid_losses)
+    plt.title(title)
+    plt.ylabel('loss'); plt.xlabel('epoch')
+    if valid_losses==[]:  # if there are only train losses
+        plt.show()
+    else:
+        plt.legend(['train', 'val'], loc='upper left')
+        plt.show()
 ```
 
 > prediction and answer plot
 ```python
+plt.figure(figsize=(15, 15))  # configure figure size
+
+# get prediction
+y = {'label': [], 'pred':[]}
+for i in range(len(test)):
+    image = np.zeros((1, 1, 232, 224, 224))
+    image[0, :, :, :, :] = test[i][0]
+    x = torch.cuda.FloatTensor(image)
+    pred = model(x)
+    pred = pred.detach().cpu().numpy()
+    y['label'].append(denormalize(test[i][1][0], data[data.columns[0]]))
+    y['pred'].append(denormalize(pred[0][0], data[data.columns[0]]))
+
+## for multiple labels
+# for i in range(5):
+#     plt.subplot(3, 2, i+1)
+
+# linear y=x
+x_new = np.linspace(0, max(y['pred']))
+y_new = x_new
+plt.plot(x_new, y_new, c='r')
+
+# scatter plot predictions
+plt.scatter(y['label'], y['pred'], c='b')
+plt.axis('square')  # prettier
+plt.ylabel('prediction'); plt.xlabel('ground truth')  # set axis name
+
+plt.tight_layout()  # prettier
+# set x, y limits if needed
+plt.xlim([0,1])
+plt.ylim([0,1])
+
+plt.show()
 ```
 
 ## Pretrained Model
