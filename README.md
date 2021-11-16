@@ -473,6 +473,7 @@ x = np.load('{FILENAME}.npy')
 
 > 한 컬럼 기준 크기순 정렬
 ```python
+df_sorted = df.sort_values(COLUMNNAME)
 ```
 
 > 인덱스 제거
