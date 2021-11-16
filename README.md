@@ -77,6 +77,13 @@ img[img < _] = _
 img[img > _] = _
 ```
 
+> 2D 이미지 resizing
+```python
+from skimage.transform import resize
+#...
+img = resize(img, (NEW_WIDTH, NEW_HEIGHT), anti_aliasing=True)
+```
+
 > 3D 이미지 resizing
 ```python
 def resize_data(data, new_size_x, new_size_y, new_size_z):
