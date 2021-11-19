@@ -192,7 +192,7 @@ class MyDataset(Dataset):
     
     def __getitem__(self, idx):
         image = self.X[idx]
-        label = np.array([self.y.iloc[idx]]).astype('float')
+        label = np.array(self.y.iloc[idx]).astype('float')
         return [image, label]
 ```
 
