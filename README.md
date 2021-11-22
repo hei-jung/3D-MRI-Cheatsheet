@@ -476,6 +476,11 @@ x = np.load('{FILENAME}.npy')
 
 > 파일 불러오기
 ```python
+# csv 파일의 경우
+df = pd.read_csv(FILENAME)
+
+# 불러올 때 index 지정
+df = pd.read_csv(FILENAME, index_col=COLUMN_NUMBER)
 ```
 
 > 한 컬럼 기준 크기순 정렬
@@ -483,14 +488,36 @@ x = np.load('{FILENAME}.npy')
 df_sorted = df.sort_values(COLUMNNAME)
 ```
 
-> 인덱스 제거
+> loc, iloc
 ```python
+useful_columns = ['col1', 'col2', 'col3']
+df_col = df.loc[:, useful_columns]
+
+useful_rows = ['row1', 'row2', 'row3']
+df_row = df.loc[useful_rows, :]
+
+df.iloc[ROW_NUM] # 행을 번호로 선택
+df.iloc[:, COL_NUM] # 열을 번호로 선택
+
+df[df['name'] == 'HJ'] # logical index
 ```
 
-> 필요한 컬럼만 추리기
+> 행, 열 이름 바꾸기
 ```python
+# 행
+df = df.rename(index={'old row name': 'new row name'})
+# 열
+df = df.rename(columns={'old column name': 'new column name'})
+
+# 또는
+df.rename(columns=COLUMNS, index=INDEX, inplace=True)
 ```
 
 > 새 파일로 저장
 ```python
+df.to_csv(FILENAME)
+# 특정 컬럼을 index로 쓰고 싶을 때
+df.to_csv(FILENAME, index_label=COLUMNNAME)
+# 자동 index 생성 방지
+df.to_csv(FILENAME, index=False)
 ```
