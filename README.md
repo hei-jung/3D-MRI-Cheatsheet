@@ -483,9 +483,28 @@ df = pd.read_csv(FILENAME)
 df = pd.read_csv(FILENAME, index_col=COLUMN_NUMBER)
 ```
 
+> 행 index, 열 index 이름 보기
+```python
+# rows
+df.index
+
+# columns
+df.columns
+```
+
 > 한 컬럼 기준 크기순 정렬
 ```python
 df_sorted = df.sort_values(COLUMNNAME)
+```
+
+> 컬럼 선택
+```python
+# single column
+df_col = df[COLUMNNAME]
+
+# multiple columns
+useful_columns = ['col1', 'col2', 'col3']
+df_col = df[useful_columns]
 ```
 
 > loc, iloc
@@ -494,7 +513,8 @@ useful_columns = ['col1', 'col2', 'col3']
 df_col = df.loc[:, useful_columns]
 
 useful_rows = ['row1', 'row2', 'row3']
-df_row = df.loc[useful_rows, :]
+df_row = df.loc[useful_rows, :] # OR
+df_row = df.loc[useful_rows]
 
 df.iloc[ROW_NUM] # 행을 번호로 선택
 df.iloc[:, COL_NUM] # 열을 번호로 선택
