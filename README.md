@@ -542,3 +542,15 @@ df.to_csv(FILENAME, index_label=COLUMNNAME)
 # 자동 index 생성 방지
 df.to_csv(FILENAME, index=False)
 ```
+
+> 행 추가
+```python
+df = df.append(NEW_ROW, ignore_index=True) 
+```
+
+`ignore_index=True`로 하면 원래 dataframe에서 새로운 index를 할당해줌.
+
+> 열 추가
+```python
+df[COLUMN_NAME] = NEW_COLUMN
+```
