@@ -48,3 +48,94 @@ $ cd MONAI/
 $ pip install -e '.[all]'
 ```
 출처: https://docs.monai.io/en/latest/installation.html#table-of-contents [Installation Guide]
+
+
+### Load부터 Transformation까지
+
+> Required Libraries
+
+```python
+from monai.transforms import (
+    AddChanneld,
+    LoadImage,
+    LoadImaged,
+    Orientationd,
+    Rand3DElasticd,
+    RandAffined,
+    Spacingd,
+    Affine,
+)
+from monai.config import print_config
+from monai.apps import download_and_extract
+import numpy as np
+import matplotlib.pyplot as plt
+import tempfile
+import shutil
+import os
+import glob
+```
+
+> Load Image
+
+```python
+data, meta = LoadImage()("test_image.dcm")
+```
+
+Check data:
+
+```python
+print(f"image data shape:{data.shape}")
+print(f"meta data:{meta}")
+```
+
+```
+image data shape:(224, 224, 232)
+meta data:{'0008|0016': '1.2.840.10008.5.1.4.1.1.7.2', '0008|0018': '1.2.826.0.1.3680043.2.1125.1.21523321020922955153453371700322151', '0008|0020': '20211202', '0008|0030': '161839.797146 ', '0008|0050': '', '0008|0060': 'OT', '0008|0090': '', '0010|0010': '', '0010|0020': '', '0010|0030': '', '0010|0040': '', '0020|000d': '1.2.826.0.1.3680043.2.1125.1.47022884073917657426301854936606650', '0020|000e': '1.2.826.0.1.3680043.2.1125.1.33081996829990243804814336994781819', '0020|0010': '', '0020|0011': '', '0020|0013': '', '0020|0052': '1.2.826.0.1.3680043.2.1125.1.21082565907138371517547930251623493', '0028|0002': '1', '0028|0004': 'MONOCHROME2 ', '0028|0008': '232 ', '0028|0009': '(5200,9230)', '0028|0010': '224', '0028|0011': '224', '0028|0100': '8', '0028|0101': '8', '0028|0102': '7', '0028|0103': '0', '0028|1052': '0 ', '0028|1053': '1 ', '0028|1054': 'US', 'spacing': array([1., 1., 1.]), 'original_affine': array([[-1.,  0.,  0.,  0.],
+       [ 0., -1.,  0.,  0.],
+       [ 0.,  0.,  1.,  0.],
+       [ 0.,  0.,  0.,  1.]]), 'affine': array([[-1.,  0.,  0.,  0.],
+       [ 0., -1.,  0.,  0.],
+       [ 0.,  0.,  1.,  0.],
+       [ 0.,  0.,  0.,  1.]]), 'spatial_shape': array([224, 224, 232]), 'original_channel_dim': 'no_channel', 'filename_or_obj': 'test_image.dcm'}
+```
+
+```python
+plt.figure("visualize", (8, 4))
+plt.subplot(1, 2, 1)
+plt.title("image")
+plt.imshow(data[:, :, 0], cmap="gray")
+plt.show()
+```
+
+> Add Channel
+
+처음에 LoadImage 통해서 이미지 불러오면 greyscale 이미지의 경우 channel dimension이 없다.
+그런데 MONAI의 transformation method들을 사용하려면 channel dimension까지 있어야 하므로, 꼭 이 과정을 거쳐야 한다. (안 그럼 에러 남)
+
+:bangbang: | 참고로 여기서부턴 단순 numpy 배열 형태가 아니라, dictionary 형태만 인수(argument)로 넣을 수 있다.
+:---: | :---
+
+그래서 나의 경우, `data_dict`라는 dictionary 변수를 다음과 같이 만들었다.
+
+```python
+data_dict = {"image": data}
+```
+
+```python
+add_channel = AddChanneld(keys=["image"])
+datac_dict = add_channel(data_dict)
+```
+
+또는
+
+```python
+data_dict = AddChanneld(keys=["image"])(data_dict)
+```
+
+Check data:
+
+```python
+print(f"image shape:{data_dict['image'].shape}")  # image shape:(1, 224, 224, 232)
+```
+
+> 
