@@ -58,21 +58,13 @@ $ pip install -e '.[all]'
 from monai.transforms import (
     AddChanneld,
     LoadImage,
-    LoadImaged,
     Orientationd,
     Rand3DElasticd,
     RandAffined,
-    Spacingd,
-    Affine,
 )
-from monai.config import print_config
-from monai.apps import download_and_extract
 import numpy as np
 import matplotlib.pyplot as plt
-import tempfile
-import shutil
-import os
-import glob
+import itk
 ```
 
 > Make test image (이건 그냥 참고용)
