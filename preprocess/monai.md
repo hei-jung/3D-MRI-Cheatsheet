@@ -138,4 +138,88 @@ Check data:
 print(f"image shape:{data_dict['image'].shape}")  # image shape:(1, 224, 224, 232)
 ```
 
-> 
+> Reorientation
+
+axis labels: Left (L), Right (R), Posterior (P), Anterior (A), Inferior (I), Superior (S)
+
+```python
+orientation = Orientationd(keys=["image", "label"], axcodes="PLI")
+data_dict = orientation(data_dict)
+```
+
+또는
+
+```python
+data_dict = Orientationd(keys=["image"], axcodes="PLI")(data_dict)
+```
+
+Check data:
+
+```python
+print(f"image shape: {data_dict['image'].shape}")
+print(f"image affine after Spacing:\n{data_dict['image_meta_dict']['affine']}")
+```
+
+```
+image shape: (1, 224, 224, 232)
+image affine after Spacing:
+[[  0.  -1.   0. 223.]
+ [ -1.   0.   0. 223.]
+ [  0.   0.  -1. 231.]
+ [  0.   0.   0.   1.]]
+ ```
+ 
+ ```python
+ image = data_dict['image']
+plt.figure("visualize", (8, 4))
+plt.subplot(1, 2, 1)
+plt.title("image")
+plt.imshow(image[0, :, :, 0], cmap="gray")
+plt.show()
+```
+
+> Random affine transformation
+
+```python
+rand_affine = RandAffined(
+    keys=["image"],
+    mode=("bilinear"),
+    prob=1.0,
+    spatial_size=(224, 224, 232),
+    translate_range=(40, 40, 2),
+    rotate_range=(np.pi / 36, np.pi / 36, np.pi / 4),
+    scale_range=(0.15, 0.15, 0.15),
+    padding_mode="border",
+)
+rand_affine.set_random_state(seed=123)
+affined_data_dict = rand_affine(data_dict)
+```
+
+```python
+print(f"image shape: {affined_data_dict['image'].shape}")  # image shape: (1, 224, 224, 232)
+```
+
+> Random elastic deformation
+
+```python
+rand_elastic = Rand3DElasticd(
+    keys=["image"],
+    mode=("bilinear"),
+    prob=1.0,
+    sigma_range=(5, 8),
+    magnitude_range=(100, 200),
+    spatial_size=(224, 224, 232),
+    translate_range=(50, 50, 2),
+    rotate_range=(np.pi / 36, np.pi / 36, np.pi),
+    scale_range=(0.15, 0.15, 0.15),
+    padding_mode="border",
+)
+rand_elastic.set_random_state(seed=123)
+deformed_data_dict = rand_elastic(data_dict)
+```
+
+```python
+print(f"image shape: {deformed_data_dict['image'].shape}")  # image shape: (1, 224, 224, 232)
+```
+
+size는 계속 그대로 유지.
