@@ -75,6 +75,14 @@ import os
 import glob
 ```
 
+> Make test image (이건 그냥 참고용)
+
+```python
+# images is list where images[0].shape = (1, 232, 224, 224)
+itk_np_view = itk.image_view_from_array(images[0].astype(np.uint8))
+itk.imwrite(itk_np_view, "test_image.dcm")
+```
+
 > Load Image
 
 ```python
