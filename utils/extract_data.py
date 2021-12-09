@@ -7,9 +7,9 @@ df_new = pd.read_csv('labels/data.csv', index_col=0)  # 새 데이터
 
 i = 0
 new_rows = pd.DataFrame([])
-for col in range(len(df_new)):
-    if df_new.index[col] not in df.index:
-        new_rows = new_rows.append(df_new.iloc[col])
+for row in range(len(df_new)):
+    if df_new.index[row] not in df.index:
+        new_rows = new_rows.append(df_new.iloc[row])
         i += 1
 
 # column 순서는 항상 이걸로 통일 (100개로 학습한 모델이 이 순서로 학습했기 때문에)
