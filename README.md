@@ -554,3 +554,15 @@ df = df.append(NEW_ROW, ignore_index=True)
 ```python
 df[COLUMN_NAME] = NEW_COLUMN
 ```
+
+### One-Hot Encoding
+
+```python
+from sklearn.preprocessing import OneHotEncoder
+class_names = [[classes[0]], [classes[1]], [classes[2]]]
+ohe = OneHotEncoder(sparse=False)
+ohe.fit(class_names)
+# check
+classes_oh = ohe.transform(class_names)
+print(classes_oh)
+```
