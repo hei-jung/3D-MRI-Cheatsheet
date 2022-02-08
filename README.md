@@ -348,6 +348,68 @@ for epoch in range(num_epochs):
     losses['train_mse'].append(train_mse)
 ```
 
+### Re-train
+
+1. retrain method
+
+```python
+from torch.autograd import Variable
+def retrain(trainloader, model, epoch, criterion, optimizer, use_cuda=True):
+    model.train()
+    total = 0, 0
+    loss_sum = 0
+    for batch_idx, (data, target) in enumerate(trainloader):
+        if use_cuda:
+            data, target = data.float(), target.float()
+        data, target = Variable(data), Variable(target)
+        optimizer.zero_grad()
+        output = model(data)
+
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+        loss_sum += loss.item()
+
+        if batch_idx % 10 == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.3f}'.format(
+                epoch, batch_idx * len(data), len(trainloader.dataset),
+                100. * batch_idx / len(trainloader), loss.item()))
+
+    loss_avg = loss_sum / len(trainloader.dataset)
+    print()
+    print('Train Epoch: {}\tAverage Loss: {:.3f}'.format(epoch, loss_avg))
+```
+
+```python
+retrain(train_loader, model, 2, criterion, optimizer)
+```
+
+2. w/o method
+
+```python
+test_model.cuda()
+total_step = len(train_loader)
+loss_list = []
+num_epochs = 2
+
+for epoch in range(num_epochs):
+    for i, (inputs, labels) in enumerate(train_loader):
+        inputs, labels = inputs.to(device, dtype=torch.float), labels.to(device, torch.float)
+        
+        # Run the forward pass
+        outputs = test_model(inputs)
+        print(outputs.shape)
+        loss = criterion(outputs, labels)
+        loss_list.append(loss.item())
+        
+        # Backprop
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        print("\nEpoch [{} / {}], Step [{} / {}], Loss: {:4f}\n".format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+```
+
 ### 데이터 시각화
 
 > loss plot
