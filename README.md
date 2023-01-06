@@ -599,7 +599,7 @@ df.rename(columns=COLUMNS, index=INDEX, inplace=True)
 > 새 파일로 저장
 ```python
 df.to_csv(FILENAME)
-# 특정 컬럼을 index로 쓰고 싶을 때
+# index column에 이름을 주고 싶을 때
 df.to_csv(FILENAME, index_label=COLUMNNAME)
 # 자동 index 생성 방지
 df.to_csv(FILENAME, index=False)
