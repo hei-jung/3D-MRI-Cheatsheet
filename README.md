@@ -7,7 +7,8 @@
 3. [레이블 전처리](#레이블-전처리)
 4. [학습 관련](#학습-관련)
 5. [Pretrained Model](#Pretrained-Model)
-6. [기타 잡다한 코드](#기타-잡다한-코드)
+6. [Figure and Table](#Figure-and-Table)
+7. [기타 잡다한 코드](#기타-잡다한-코드)
 
 
 ## 자주 쓰는 라이브러리
@@ -492,6 +493,63 @@ model = _model
 >> Missing key(s) in state_dict & Unexpected key(s) in state_dict
 ```python
 model.load_state_dict(pretrained, strict=False)  # strict: False로 해주기
+```
+
+## Figure and Table
+
+### model summary
+
+```python
+from models.custom_net import *
+import numpy as np
+import os
+from torchsummary import summary
+model = CustomNet(classes=1)
+img = np.load('img_npy/' + os.listdir('img_npy/')[0])
+shape = [1]
+shape += list(img.shape)
+summary(model.cuda(), tuple(shape)) #####
+```
+
+### figure number
+
+```python
+i = 0
+plt.figure(figsize=(16,8))
+for key, value in samples.items():
+    filename = img_nifti + value.index[0] + '/'
+    filename = filename + os.listdir(filename)[0]
+    
+    img = nib.load(filename)
+    img = img.get_fdata()
+        
+    mip = np.max(img, axis=1)
+    mip = zoom(mip, (1,512/mip.shape[1]))
+    mip = rotate(mip, 90)
+
+    plt.subplot(2,4,i+1)
+    plt.text(10,10, chr(ord('A')+i),
+           horizontalalignment='left',
+           verticalalignment='top',
+           bbox=dict(facecolor='white', alpha=0.6),
+           fontsize=12.5)
+    plt.imshow(mip, cmap='gray')
+    plt.axis('off')
+    
+    plt.subplot(2,4,i+5)
+    plt.text(10,10, chr(ord('A')+i),
+       horizontalalignment='left',
+       verticalalignment='top',
+       bbox=dict(facecolor='white', alpha=0.6),
+       fontsize=12.5)
+    axial = img[:, :, img.shape[2]//2]
+    axial = rotate(axial, 90)
+    plt.imshow(axial, cmap='gray')
+    plt.axis('off')
+    i+=1
+plt.tight_layout()
+plt.show()
+plt.close()
 ```
 
 ## 기타 잡다한 코드
